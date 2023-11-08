@@ -1,34 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, {useState} from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [list, setList] = useState([]); //empty useState array
+  const [input, setInput] = useState(""); // empty useState string
+
+  //Adding a todo
+  const addTodo = (todo) => {
+    //creating new todo
+    const newTodo = {
+      //unique id
+      id: Math.random(),
+      todo: todo,
+    };
+    //add todo to the list
+    setList([...list, newTodo]);
+    //clear input
+    setInput("");
+  };
+
+  //delete todo function
+  const deleteTodo = (id) => {
+    //filtering out the todo with the id
+    const updatedList = list.filter((todo) => todo.id !== id);
+
+    setList(updatedList);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div>
+      <h1>Todo List</h1>
+      <input type="text" value={input} 
+      onChange={(e) => setInput(e.target.value)} 
+      />
+      <button onClick={()=> addTodo(input)}>Add</button>
+      <ul>
+        {list.map((todo)=> (
+          <li key={todo.id}>
+            {todo.todo}
+            <button onClick={()=> deleteTodo(todo.id)}>&times;</button>
+            </li>
+        )
+        )}
+      </ul>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
   )
 }
 
