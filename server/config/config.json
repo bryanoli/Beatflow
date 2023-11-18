@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "Compsci2018!",
-    "database": "database_development",
+    "database": "beatflow_db",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

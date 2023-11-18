@@ -1,18 +1,26 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 app.use(express.json());
+app.use(cors());
 
 const db = require('./models');
+const addDummyData = require('./scripts/dummydata');
 
-//Routers
+// Routers
+const userRouter = require('./routes/users');
+const songRouter = require('./routes/songs');
+const favoritesRouter = require('./routes/favorites');
 
-const postRouter = require('./routes/posts');
-app.use('/posts', postRouter);
+app.use('/users', userRouter);
+app.use('/songs', songRouter);
+app.use('/favorites', favoritesRouter);
 
-db.sequelize.sync().then(() => {
-    app.listen(3000, () => {
-        console.log('Server listening on port 3000');
-    });
+db.sequelize.sync({ force: true }).then(() => {
+  addDummyData();
+  app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+  });
 });
 
