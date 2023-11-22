@@ -12,10 +12,11 @@ const addDummyData = require('./scripts/dummydata');
 const userRouter = require('./routes/users');
 const songRouter = require('./routes/songs');
 const favoritesRouter = require('./routes/favorites');
-
+const authRouter = require('./routes/auth');
 app.use('/users', userRouter);
 app.use('/songs', songRouter);
 app.use('/favorites', favoritesRouter);
+app.use('/auth', authRouter);
 
 db.sequelize.sync({ force: true }).then(() => {
   addDummyData();

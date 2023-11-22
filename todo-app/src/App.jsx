@@ -1,9 +1,14 @@
-import React, {useState} from 'react'
+import React, {Component, useState} from 'react'
+import Nav from './components/nav';
+import Home from "./pages/Home";
+import Discover from "./pages/Discover";
+import Favorites from "./pages/Favorites";
+import Settings from "./pages/Settings";
+import {Route, Routes} from "react-router-dom";
 
 function App() {
   const [list, setList] = useState([]); //empty useState array
   const [input, setInput] = useState(""); // empty useState string
-
   //Adding a todo
   const addTodo = (todo) => {
     //creating new todo
@@ -27,8 +32,17 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Todo App</h1>
+    <>
+    <Nav />
+    <div className='container'>
+      <Routes>
+        <Route path='/' element={<Home/>} />
+        <Route path='/Discover' element={<Discover/>} />
+        <Route path='/Favorites' element={<Favorites/>} />
+        <Route path='/Settings' element={<Settings/>} />
+      </Routes>
+    </div>
+    {/* <div>
       <input type="text" value={input} 
       onChange={(e) => setInput(e.target.value)} 
       />
@@ -42,7 +56,9 @@ function App() {
         )
         )}
       </ul>
-      </div>
+      </div> */}
+    </>
+
   )
 }
 
