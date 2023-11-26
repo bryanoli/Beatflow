@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export const Register = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userName, setUserName] = useState('');
+  const [username, setUserName] = useState('');
 
   const handleUserNameChange = (e) => {
     setUserName(e.target.value);
@@ -17,23 +18,42 @@ export const Register = (props) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(userName, email, password);
-    // Add your logic for handling form submission (e.g., making an API request for registration)
-  };
+    try {
+        const response = await axios.post("http://localhost:3000/auth/register", {
+          username:username,    
+          email:email,
+          password:password,
+        },   
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(response.data);
+        if (response.data === "Found") {
+            alert("User already exists");
+        } else if (response.data === "Does not exist") {
+            alert("User has not signed up yet");
+        }
+    } catch (error) {
+        alert("Wrong details");
+        console.error(error);
+    }
+}
 
   return (
     <div className='auth-form-container'>
         <h2>Register</h2>
       <form className="registration-form" onSubmit={handleSubmit}>
-        <label htmlFor="name">Full Name</label>
+        <label htmlFor="username">Username</label>
         <input
-          value={userName}
+          value={username}
           onChange={handleUserNameChange} // Add onChange handler
-          placeholder="Full Name"
-          id="name"
-          name="name"
+          placeholder="Username"
+          id="username"
+          name="username"
         />
         <label htmlFor="email">Email</label>
         <input

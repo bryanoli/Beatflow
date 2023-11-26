@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+
 
 export const Login = (props) => {
   const [email, setEmail] = useState('');
@@ -12,15 +14,32 @@ export const Login = (props) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3000/auth/login", {
+        email,
+        password,
+      });
+
+      if (response.data === "Found") {
+        alert("Login successful");
+        navigate("/home", { state: { id: email } });
+      } else if (response.data === "Does not exist") {
+        alert("User has not signed up yet");
+      }
+    } catch (error) {
+      alert("Wrong details");
+      console.error(error);
+    }
+
     console.log(email, password);
-    // Add your logic for handling form submission (e.g., making an API request for login)
   };
+
 
   return (
     <div className='auth-form-container'>
-        <h2>Login</h2>
+      <h2>Login</h2>
       <form className="login-form" onSubmit={handleSubmit}>
         <label htmlFor="email">Email</label>
         <input
