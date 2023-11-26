@@ -2,22 +2,25 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
+const { Op } = require('sequelize');
 
 // Registration
 router.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     // Check if the username already exists
-    const existingUser = await User.findOne({ where: { username } });
+    const existingUser = await User.findOne({  where: {
+      [Op.or]: [{ username }, { email }],
+    }, });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists' });
+      return res.status(400).json({ message: 'Username or email already exists' });
     }
 
     // Hash the password before storing it
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({ username, password: hashedPassword });
+    const newUser = await User.create({ username, email, password: hashedPassword });
     res.status(201).json(newUser);
   } catch (error) {
     console.error('Error creating user:', error);
