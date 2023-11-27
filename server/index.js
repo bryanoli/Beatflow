@@ -18,7 +18,7 @@ app.use('/songs', songRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/auth', authRouter);
 
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync().then(() => {
   addDummyData();
   app.listen(3000, () => {
     console.log('Server listening on port 3000');

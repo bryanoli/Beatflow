@@ -28,8 +28,23 @@ const addDummyData = async () => {
     ];
 
     // Insert dummy data into the database
-    const users = await User.bulkCreate(dummyUsers, { returning: true });
-    const songs = await Song.bulkCreate(dummySongs, { returning: true });
+    const users = [];
+    for (const dummyUser of dummyUsers) {
+      const [user, created] = await User.findOrCreate({
+        where: { email: dummyUser.email },
+        defaults: dummyUser,
+      });
+      users.push(user);
+    }
+
+    const songs = [];
+    for (const dummySong of dummySongs) {
+      const [song, created] = await Song.findOrCreate({
+        where: { title: dummySong.title },
+        defaults: dummySong,
+      });
+      songs.push(song);
+    }
 
     const dummyFavorites = [
       { UserId: users[0].id, SongId: songs[0].id },
