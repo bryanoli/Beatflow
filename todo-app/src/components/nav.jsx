@@ -5,6 +5,7 @@ import { Link, useMatch, useResolvedPath } from 'react-router-dom';
 export default function Nav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -40,9 +41,9 @@ export default function Nav() {
       {!isMobile && (
         <><Link to="/" className="site-title">BeatFlow
               </Link><ul>
-                <CustomLink to="/Discover">Discover</CustomLink>
-                <CustomLink to="/Favorites">Favorites</CustomLink>
-                <CustomLink to="/Settings">Settings</CustomLink>
+                {isLoggedIn && <CustomLink to="/Discover">Discover</CustomLink>}
+                {isLoggedIn && <CustomLink to="/Favorites">Favorites</CustomLink>}
+                {isLoggedIn && <CustomLink to="/Settings">Settings</CustomLink>}
                   </ul></>
       )}
 

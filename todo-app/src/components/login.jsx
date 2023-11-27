@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { useAuth } from '../authentication/auth.jsx';
 import axios from 'axios';
 
 
 export const Login = (props) => {
-  const [email, setEmail] = useState('');
+  const { login } = useAuth();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleUserNameChange = (e) => {
+    setUsername(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -18,22 +20,28 @@ export const Login = (props) => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:3000/auth/login", {
-        email,
+        username,
         password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      if (response.data === "Found") {
+      if (response.data.message === "Login successful") {
         alert("Login successful");
-        navigate("/home", { state: { id: email } });
-      } else if (response.data === "Does not exist") {
-        alert("User has not signed up yet");
+        login();
+
+      } else {
+        alert("Invalid credentials");
       }
     } catch (error) {
       alert("Wrong details");
       console.error(error);
     }
 
-    console.log(email, password);
+    console.log(username, password);
   };
 
 
@@ -41,14 +49,14 @@ export const Login = (props) => {
     <div className='auth-form-container'>
       <h2>Login</h2>
       <form className="login-form" onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
+        <label htmlFor="username">Username</label>
         <input
-          value={email}
-          onChange={handleEmailChange} // Add onChange handler
-          type="email"
-          placeholder="youremail@gmail.com"
-          id="email"
-          name="email"
+          value={username}
+          onChange={handleUserNameChange} // Add onChange handler
+          type="username"
+          placeholder="username"
+          id="username"
+          name="username"
         />
         <label htmlFor="password">Password</label>
         <input

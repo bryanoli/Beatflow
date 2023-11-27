@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export const Register = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUserName] = useState('');
+  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
 
   const handleUserNameChange = (e) => {
     setUserName(e.target.value);
@@ -36,6 +39,8 @@ export const Register = (props) => {
             alert("User already exists");
         } else if (response.data === "Does not exist") {
             alert("User has not signed up yet");
+        }else {
+          setSuccess(true);
         }
     } catch (error) {
         alert("Wrong details");
@@ -44,6 +49,16 @@ export const Register = (props) => {
 }
 
   return (
+    <div className='auth-form-container'>
+      {success ? (
+        // Display success message
+        <div>
+          <h2>Registration Successful!</h2>
+          <p>Your new account has been created.</p>
+          <button onClick={() => props.onFormSwitch('login')}>Go to login page</button>
+          {/* You can add additional content or redirect the user to another page */}
+        </div>
+      ) : (
     <div className='auth-form-container'>
         <h2>Register</h2>
       <form className="registration-form" onSubmit={handleSubmit}>
@@ -78,6 +93,8 @@ export const Register = (props) => {
       <button className="link-btn" onClick={() => props.onFormSwitch('login')}>
         If you have an account click here
       </button>
+    </div>
+      )}
     </div>
   );
 };

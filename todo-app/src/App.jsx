@@ -1,9 +1,9 @@
 import React, {Component, useState} from 'react'
 import Nav from './components/nav';
 import Home from "./pages/Home";
-import Discover from "../user-pages/Discover";
-import Favorites from "../user-pages/Favorites";
-import Settings from "../user-pages/Settings";
+import Discover from "./user-pages/Discover";
+import Favorites from "./user-pages/Favorites";
+import Settings from "./user-pages/Settings";
 import {Route, Routes} from "react-router-dom";
 
 function App() {
