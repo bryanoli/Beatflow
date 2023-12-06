@@ -2,15 +2,17 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './styles/styles.css'
-import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from './authentication/auth.jsx';
+import { DataLayer } from "./DataLayer";
+import reducer, {initialState} from './reducer.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-    <AuthProvider>
+    <DataLayer initialState={initialState} reducer={reducer}>
+    {/* <BrowserRouter> */}
+    {/* <AuthProvider> */}
     <App />
-    </AuthProvider>
-    </BrowserRouter>
+    {/* </AuthProvider> */}
+    {/* </BrowserRouter> */}
+    </DataLayer>
   </React.StrictMode>,
 )

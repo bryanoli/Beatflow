@@ -3,6 +3,7 @@ import { Login } from '../components/login';
 import { Register } from '../components/registration';
 import '../App.css';
 
+
 export default function Home() {
     const [currentForm, setCurrentForm] = useState('login'); // ['login', 'register'
     const toggleForm = (formName) => {

@@ -6,7 +6,7 @@ app.use(express.json());
 app.use(cors());
 
 const db = require('./models');
-const addDummyData = require('./scripts/dummydata');
+// const addDummyData = require('./scripts/dummydata');
 
 // Routers
 const userRouter = require('./routes/users');
@@ -19,9 +19,9 @@ app.use('/favorites', favoritesRouter);
 app.use('/auth', authRouter);
 
 db.sequelize.sync().then(() => {
-  addDummyData();
-  app.listen(3000, () => {
-    console.log('Server listening on port 3000');
+  // addDummyData();
+  app.listen(3001, () => {
+    console.log('Server listening on port 3001');
   });
 });
 

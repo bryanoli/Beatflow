@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/components/desktopNav.css';
 import { Link, useMatch, useResolvedPath } from 'react-router-dom';
+import { useAuth } from '../authentication/auth.jsx';
 
 export default function Nav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const {isLoggedIn} = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);

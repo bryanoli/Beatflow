@@ -12,7 +12,20 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.TEXT,
         allowNull: false
-      }
+      },
+      spotifyID: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      spotifyAccessToken: {
+        type: DataTypes.STRING, 
+        allowNull: true
+      },
+      spotifyRefreshToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+
     });
   
     return User;
