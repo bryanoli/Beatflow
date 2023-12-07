@@ -5,7 +5,20 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { loginUrl } from "../authentication/spotifyconfig.jsx";
 
-export const Login = (props) => {
+function Login() {
+    return (
+        <div className="login">
+            <img
+                src="https://getheavy.com/wp-content/uploads/2019/12/spotify2019-830x350.jpg"
+                alt=""/>
+            <a href={ loginUrl }>Login with Spotify</a>
+        </div>
+    )
+}
+
+export default Login
+
+// export const Login = (props) => {
   // const AUTH_URL = "http://localhost:3001/auth/login-spotify";
   // const [username, setUsername] = useState('');
   // const [password, setPassword] = useState('');
@@ -49,15 +62,6 @@ export const Login = (props) => {
   //   console.log(username, password);
   // };
 
-
-  return (
-    <div className="login">
-      <img
-        src="https://music-b26f.kxcdn.com/wp-content/uploads/2017/06/635963274692858859903160895_spotify-logo-horizontal-black.jpg"
-        alt="Spotify logo"
-      />
-      <a href={loginUrl}>LOGIN WITH SPOTIFY</a>
-    </div>
     // <div className='auth-form-container'>
     //   <h2>Login</h2>
     //   <form className="login-form" onSubmit={handleSubmit}>
@@ -86,5 +90,5 @@ export const Login = (props) => {
     //     Don't have an account? Register here
     //   </button>
     // </div>
-  );
-};
+//   );
+// };
