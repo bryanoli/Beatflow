@@ -1,65 +1,107 @@
-import React from "react";
-import "../styles/components/Body.css";
-import Header from "../components/Header";
-import { useDataLayerValue } from "../DataLayer";
-import { useVolumeLayerValue } from "../volumeLayer";
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import PauseCircleFilledIcon from "@material-ui/icons/PauseCircleFilled";
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import SongRow from "../components/SongRow";
+import { useState, useEffect } from "react"
+import useAuth from "../authentication/auth"
+import "../styles/components/Player.css"
+import Footer from "./Footer"
+import TrackSearchResult from "./TrackSearch"
+import { Container, Form } from "react-bootstrap"
+import SpotifyWebApi from "spotify-web-api-node"
+import axios from "axios"
 
-function Body({ spotify }) {
-  const [{ discover_weekly, current_playlist, tracks, track }] = useDataLayerValue();
-  const [{ audio, playing, volume, repeat, shuffle }, soundDispatch] = useVolumeLayerValue();
+const spotifyApi = new SpotifyWebApi({
+  clientId: "3bf93ed47f8d4e1cb7181a0336888a7e",
+})
 
-  const startPlaying = () => {
-    soundDispatch({
-      type: "SET_PLAYING",
-      playing: true
-    });
-    soundDispatch({
-      type: "SET_VOLUME",
-      volume: volume / 100
-    });
-  };
+export default function Dashboard({ code,spotify }) {
+  const accessToken = useAuth(code)
+  const [search, setSearch] = useState("")
+  const [searchResults, setSearchResults] = useState([])
+  const [playingTrack, setPlayingTrack] = useState()
+  const [lyrics, setLyrics] = useState("")
 
-  const stopPlaying = () => {
-    soundDispatch({
-      type: "SET_PLAYING",
-      playing: false
-    });
-  };
+  function chooseTrack(track) {
+    setPlayingTrack(track)
+    setSearch("")
+    setLyrics("")
+  }
+
+  useEffect(() => {
+    if (!playingTrack) return
+
+    axios
+      .get("http://localhost:3001/lyrics", {
+        params: {
+          artist: playingTrack.artist,
+          track: playingTrack.title,
+          
+        },
+      })
+      .then(res => {
+        setLyrics(res.data.lyrics)
+      })
+  }, [playingTrack])
+
+  useEffect(() => {
+    if (!accessToken) return
+    spotifyApi.setAccessToken(accessToken)
+  }, [accessToken])
+
+  useEffect(() => {
+    if (!search) return setSearchResults([])
+    if (!accessToken) return
+
+    let cancel = false
+    spotifyApi.searchTracks(search).then(res => {
+      if (cancel) return
+      setSearchResults(
+        res.body.tracks.items.map(track => {
+          const smallestAlbumImage = track.album.images.reduce(
+            (smallest, image) => {
+              if (image.height < smallest.height) return image
+              return smallest
+            },
+            track.album.images[0]
+          )
+
+          return {
+            artist: track.artists[0].name,
+            title: track.name,
+            uri: track.uri,
+            albumUrl: smallestAlbumImage.url,
+          }
+        })
+      )
+    })
+
+    return () => (cancel = true)
+  }, [search, accessToken])
 
   return (
-    <div className="body">
-      <Header spotify={spotify} />
-      <div className="body__info">
-        <img
-          src={current_playlist ? current_playlist?.images[0].url : 'https://cdn.shortpixel.ai/client/to_webp,q_lossy,ret_img,w_250/https://www.hypebot.com/wp-content/uploads/2020/07/discover-weekly-250x250.png'}
-          alt="" />
-        <div className="body__infoText">
-          <strong>PLAYLIST</strong>
-          <h2>{current_playlist?.name}</h2>
-          <p>{current_playlist?.description}</p>
-        </div>
-      </div>
 
-      <div className="body__songs">
-        <div className="body__icons">
-          {playing ? <PauseCircleFilledIcon onClick={track ? stopPlaying : null}
-            className='body__shuffle' /> :
-            <PlayCircleFilledIcon onClick={track ? startPlaying : null} fontSize='large'
-              className='body__shuffle' />}
-          <FavoriteIcon fontSize='large' />
-          <MoreHorizIcon />
-        </div>
-        {tracks?.items.map(track => {
-          return <SongRow track={track.track} key={track.track.id} />
-        })}
+    <Container className="d-flex flex-column py-2" style={{ height: "100vh" }}>
+      <Form.Control
+        type="search"
+        placeholder="Search Songs/Artists"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
+      <div className="flex-grow-1 my-2" style={{ overflowY: "auto" }}>
+        {searchResults.map(track => (
+          <TrackSearchResult
+            track={track}
+            key={track.uri}
+            chooseTrack={chooseTrack}
+          />
+        ))}
+        {searchResults.length === 0 && (
+          <div className="text-center" style={{ whiteSpace: "pre" }}>
+            {lyrics}
+          </div>
+        )}
       </div>
-    </div>
+      <div>
+        <Footer accessToken={accessToken} trackUri={playingTrack?.uri} />
+      </div>
+    </Container>
+
   )
 }
-
-export default Body;

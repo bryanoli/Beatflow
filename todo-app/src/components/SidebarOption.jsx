@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useDataLayerValue } from "../DataLayer";
 import "../styles/components/SidebarOption.css";

@@ -1,54 +1,45 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react"
+import axios from "axios"
 
-const AuthContext = createContext();
+export default function useAuth(code) {
+  const [accessToken, setAccessToken] = useState()
+  const [refreshToken, setRefreshToken] = useState()
+  const [expiresIn, setExpiresIn] = useState()
 
+  useEffect(() => {
+    axios
+      .post("http://localhost:3001/login", {
+        code,
+      })
+      .then(res => {
+        setAccessToken(res.data.accessToken)
+        setRefreshToken(res.data.refreshToken)
+        setExpiresIn(res.data.expiresIn)
+        window.history.pushState({}, null, "/")
+      })
+      .catch(() => {
+        window.location = "/"
+      })
+  }, [code])
 
-export default function useAuthen(code){
-    const [accessToken, setAccessToken] = useState();
-    const [refreshToken, setRefreshToken] = useState();
-    const [expiresIn, setExpiresIn] = useState();
+  useEffect(() => {
+    if (!refreshToken || !expiresIn) return
+    const interval = setInterval(() => {
+      axios
+        .post("http://localhost:3001/refresh", {
+          refreshToken,
+        })
+        .then(res => {
+          setAccessToken(res.data.accessToken)
+          setExpiresIn(res.data.expiresIn)
+        })
+        .catch(() => {
+          window.location = "/"
+        })
+    }, (expiresIn - 60) * 1000)
 
-    useEffect(() =>{
-        axios.post('http://localhost:3001/auth/login-spotify', {
-            code,
-        }).then(res => {
-          console.log(res.data);
-          setAccessToken(res.data.access_token);
-          setRefreshToken(res.data.refresh_token);
-          setExpiresIn(res.data.expires_in);
-          windows.history.pushState({}, null, '/');
-        }).catch(() => {
-          window.location = '/';
-          // Handle the error, such as redirecting the user to an error page or showing an error message
-        });
-    }, [code]);
+    return () => clearInterval(interval)
+  }, [refreshToken, expiresIn])
 
-    useEffect(() => {
-      
-    }, [refreshToken, expiresIn]);
-
-    return accessToken;
+  return accessToken
 }
-
-export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const login = () => {
-    setIsLoggedIn(true);
-  };
-
-  const logout = () => {
-    setIsLoggedIn(false);
-  };
-
-  return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-};

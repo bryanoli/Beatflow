@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Song } = require('../models');
+const axios = require('axios');
 
 // GET all songs
-router.get('/', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const songs = await Song.findAll();
     res.json(songs);
