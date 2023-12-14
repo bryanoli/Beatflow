@@ -2,7 +2,6 @@ require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
-const lyricsFinder = require('lyrics-finder');
 const SpotifyWebApi = require("spotify-web-api-node")
 const { getLyrics } = require('genius-lyrics-api');
 
@@ -11,15 +10,16 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+
+const spotifyApi = new SpotifyWebApi({
+  redirectUri: process.env.REDIRECT_URI,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+})
+
 app.post("/refresh", (req, res) => {
   const refreshToken = req.body.refreshToken
-  const spotifyApi = new SpotifyWebApi({
-    redirectUri: process.env.REDIRECT_URI,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken,
-  })
-
+  spotifyApi.setRefreshToken(refreshToken)
   spotifyApi
     .refreshAccessToken()
     .then(data => {
@@ -34,29 +34,37 @@ app.post("/refresh", (req, res) => {
     })
 })
 
-app.post("/login", (req, res) => {
-  const code = req.body.code
-  const spotifyApi = new SpotifyWebApi({
-    redirectUri: process.env.REDIRECT_URI,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-  })
+app.post("/login", async (req, res) => {
+  const code = req.body.code;
 
-  spotifyApi
-    .authorizationCodeGrant(code)
-    .then(data => {
-      res.json({
-        accessToken: data.body.access_token,
-        refreshToken: data.body.refresh_token,
-        expiresIn: data.body.expires_in,
-      })
-    })
-    .catch(err => {
-      res.sendStatus(400)
-    })
-})
+  try {
+    // Authorization Code Grant
+    const authorizationData = await spotifyApi.authorizationCodeGrant(code);
 
+    // Set access token
+    const accessToken = authorizationData.body.access_token;
+    spotifyApi.setAccessToken(accessToken);
 
+    // Get user information
+    const userData = await spotifyApi.getMe();
+
+    // Respond with access token, refresh token, and user data
+    res.json({
+      accessToken: accessToken,
+      refreshToken: authorizationData.body.refresh_token,
+      expiresIn: authorizationData.body.expires_in,
+      userData: {
+        display_name: userData.body.display_name,
+        email: userData.body.email,
+        image_url: userData.body.images[0].url,
+        product: userData.body.product,
+      },
+    });
+  } catch (err) {
+    console.log('Error during login:', err.message);
+    res.sendStatus(400);
+  }
+});
 
 app.get("/lyrics", async (req, res) => {
   const options = {

@@ -1,0 +1,25 @@
+/* Discover.css */
+.discover-container {
+    padding: 20px;
+  }
+  
+  .featured-playlists {
+    margin-top: 20px;
+  }
+  
+  .playlist-list {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+  }
+  
+  .playlist-item {
+    width: 150px;
+    text-align: center;
+  }
+  
+  .playlist-item img {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
